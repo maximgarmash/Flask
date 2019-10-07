@@ -1,15 +1,12 @@
 from flask import Flask
+from flask import request
+from flask import jsonify
 import requests
 import json
 import constants
 
 
-# app = Flask(__name__)
-
-# @app.route('/')
-# def index():
-#     return '<h1>Test flask app<h1>'
-
+app = Flask(__name__)
 
 # 1. Прием сообщений
 # 2. Отслыка сообщений
@@ -35,13 +32,28 @@ def send_message(chat_id, text='bla-bla-bla'):
     return r.json()
 
 
+@app.route('/', methods=['POST', 'GET'])
+def index():
+    if request.method == 'POST':
+        r = request.get_json()
+        # write_json(r)
+        chat_id = r['message']['chat']['id']
+        message = r['message']['text']
+        if 'bitcoin' in message:
+            send_message(chat_id, text='очень дорогой!')
+        return jsonify(r)
+    return '<h1>Bot welcomes you<h1>'
+
 def main():
     # res = requests.get(URL + 'getMe')
     # write_json(res.json())
-    r = get_updates()
-    chat_id = r['result'][-1]['message']['chat']['id']
-    send_message(chat_id)
+    # r = get_updates()
+    # chat_id = r['result'][-1]['message']['chat']['id']
+    # send_message(chat_id)
+    pass
 
 
 if __name__ == "__main__":
-    main()
+    app.run()
+    # main()
+
