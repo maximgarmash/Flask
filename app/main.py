@@ -1,14 +1,15 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
-from flask_sslify import SSLify
+# from flask_sslify import SSLify
 import requests
 import json
 import constants
 import re
+import ReplyKeyboard
 
 app = Flask(__name__)
-sslify = SSLify(app)
+# sslify = SSLify(app)
 
 # 1. Прием сообщений
 # 2. Отслыка сообщений
@@ -36,8 +37,11 @@ def send_message(chat_id, text='bla-bla-bla'):
 
 def parse_text(text):
     pattern = r'/\w+'
-    crypto = re.search(pattern, text).group()
-    return crypto[1:]
+    if re.search(pattern, text):
+        crypto = re.search(pattern, text).group()
+        return crypto[1:]
+    # crypto = re.search(pattern, text).group()
+    # return crypto[1:]
 
 
 def get_price(crypto):
@@ -47,6 +51,9 @@ def get_price(crypto):
     # write_json(r.json(), filename='price.json')
     return price
 
+def get_crypto():
+    pass
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -55,8 +62,13 @@ def index():
         # write_json(r)
         chat_id = r['message']['chat']['id']
         message = r['message']['text']
-        if parse_text(message):
-            send_message(chat_id, get_price(parse_text(message)) + ' USD')
+        user_markup = json.dumps(ReplyKeyboard.reply_keyboard)
+        print(user_markup)
+        if message == '/start':
+            send_message(chat_id, 'Добро пожаловать!', reply_markup=user_markup)
+
+        # if parse_text(message):
+        #     send_message(chat_id, get_price(parse_text(message)) + ' USD')
         return jsonify(r)
     return '<h1>Bot welcomes you<h1>'
 
