@@ -62,8 +62,8 @@ def index():
         # write_json(r)
         chat_id = r['message']['chat']['id']
         message = r['message']['text']
-        user_markup = json.dumps(ReplyKeyboard.reply_keyboard)
-        print(user_markup)
+        user_markup = json.dumps(ReplyKeyboard.reply_keyboard) #, indent=4, sort_keys=True)
+        # print(user_markup)
         if message == '/start':
             send_message(chat_id, 'Добро пожаловать!', reply_markup=user_markup)
 
