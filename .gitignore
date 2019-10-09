@@ -2,3 +2,4 @@
 /.idea/
 /app/constants.py
 /app/answer.json
+/ngrok.exe
