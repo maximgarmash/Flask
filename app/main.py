@@ -36,7 +36,7 @@ def send_message(chat_id, text, reply_markup={}):
 
 
 def parse_text(text):
-    pattern = r'/\$[A-Za-z]'
+    pattern = r''
     if re.search(pattern, text):
         crypto = re.search(pattern, text).group()
         return crypto[2:]
@@ -68,9 +68,9 @@ def index():
             send_message(chat_id, 'До новых встреч!', reply_markup=ReplyKeyboard.hide_markup)
         if message == '/cryptocurrencies':
             res_coin = requests.get(constants.url_coin).json()
-            send_message(chat_id, '\n'.join(['/$' + coin['id'] for coin in res_coin]))
-        if parse_text(message):
-            send_message(chat_id, get_price(parse_text(message)) + ' USD')
+            send_message(chat_id, '\n'.join(['/' + coin['id'] + for coin in res_coin]))
+        # if parse_text(message):
+        #     send_message(chat_id, get_price(parse_text(message)) + ' US$')
         return jsonify(r)
     return '<h1>Bot welcomes you<h1>'
 
