@@ -28,18 +28,18 @@ def write_json(data, filename='answer.json'):
 #     return res.json()
 
 
-def send_message(chat_id, text='bla-bla-bla'):
+def send_message(chat_id, text, reply_markup={}):
     url = URL + 'sendMessage'
-    answer = {'chat_id': chat_id, 'text': text}
+    answer = {'chat_id': chat_id, 'text': text, 'reply_markup': reply_markup}
     r = requests.post(url, json=answer)
     return r.json()
 
 
 def parse_text(text):
-    pattern = r'/\w+'
+    pattern = r'/\$[A-Za-z]'
     if re.search(pattern, text):
         crypto = re.search(pattern, text).group()
-        return crypto[1:]
+        return crypto[2:]
     # crypto = re.search(pattern, text).group()
     # return crypto[1:]
 
@@ -62,12 +62,15 @@ def index():
         # write_json(r)
         chat_id = r['message']['chat']['id']
         message = r['message']['text']
-        user_markup = json.dumps(ReplyKeyboard.reply_keyboard, indent=4, sort_keys=True)
-        print(user_markup)
         if message == '/start':
-            send_message(chat_id, 'Добро пожаловать!')
-        # if parse_text(message):
-        #     send_message(chat_id, get_price(parse_text(message)) + ' USD')
+            send_message(chat_id, 'Добро пожаловать!\nЧем могу помочь? ...', reply_markup=ReplyKeyboard.start_markup)
+        if message == '/stop':
+            send_message(chat_id, 'До новых встреч!', reply_markup=ReplyKeyboard.hide_markup)
+        if message == '/cryptocurrencies':
+            res_coin = requests.get(constants.url_coin).json()
+            send_message(chat_id, '\n'.join(['/$' + coin['id'] for coin in res_coin]))
+        if parse_text(message):
+            send_message(chat_id, get_price(parse_text(message)) + ' USD')
         return jsonify(r)
     return '<h1>Bot welcomes you<h1>'
 
