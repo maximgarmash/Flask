@@ -32,14 +32,15 @@ def send_message(chat_id, text, reply_markup={}):
     url = URL + 'sendMessage'
     answer = {'chat_id': chat_id, 'text': text, 'reply_markup': reply_markup}
     r = requests.post(url, json=answer)
-    return r.json()
+    # return r.json()
 
 
 def parse_text(text):
-    pattern = r''
+    pattern = r'/\w+'
     if re.search(pattern, text):
         crypto = re.search(pattern, text).group()
-        return crypto[2:]
+        if crypto[1:] not in constants.command:
+            return crypto[1:].replace('_', '-')
     # crypto = re.search(pattern, text).group()
     # return crypto[1:]
 
@@ -48,8 +49,9 @@ def get_price(crypto):
     url = 'https://api.coinmarketcap.com/v1/ticker/{}'.format(crypto)
     r = requests.get(url).json()
     price = r[-1]['price_usd']
-    # write_json(r.json(), filename='price.json')
     return price
+    # write_json(r.json(), filename='price.json')
+
 
 def get_crypto():
     pass
@@ -68,9 +70,9 @@ def index():
             send_message(chat_id, 'До новых встреч!', reply_markup=ReplyKeyboard.hide_markup)
         if message == '/cryptocurrencies':
             res_coin = requests.get(constants.url_coin).json()
-            send_message(chat_id, '\n'.join(['/' + coin['id'] + for coin in res_coin]))
-        # if parse_text(message):
-        #     send_message(chat_id, get_price(parse_text(message)) + ' US$')
+            send_message(chat_id, '\n'.join([coin['symbol'].ljust(15, ' ') + '/{}'.format(coin['id']).replace('-', '_') for coin in res_coin]))
+        if parse_text(message):
+            send_message(chat_id, get_price(parse_text(message)) + ' US$')
         return jsonify(r)
     return '<h1>Bot welcomes you<h1>'
 
